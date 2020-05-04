@@ -41,8 +41,8 @@ const TIMES: DurationFormatAssetsTime = {
 		DEFAULT: 'dagen'
 	},
 	[TimeTypes.Hour]: {
-		1: 'huur',
-		DEFAULT: 'huren'
+		1: 'uur',
+		DEFAULT: 'uren'
 	},
 	[TimeTypes.Minute]: {
 		1: 'minuut',
@@ -176,17 +176,17 @@ export default class extends Language {
 		RESOLVER_STRING_SUFFIX: ' karakters',
 		RESOLVER_MINMAX_EXACTLY: (name, min) => `${name} moet exact ${min} zijn.`,
 		RESOLVER_MINMAX_BOTH: (name, min, max, inclusive) => `${name} moet tussen minimaal ${min} en maximimaal ${max} (${inclusive ? 'inclusief' : 'exclusief'}) zijn.`,
+		RESOLVER_MINMAX_MIN: (name, min, inclusive) => `${name} moet groter zijn dan ${min} (${inclusive ? 'inclusief' : 'exclusief'}).`,
+		RESOLVER_MINMAX_MAX: (name, max, inclusive) => `${name} must be minder zijn dan ${max} (${inclusive ? 'inclusief' : 'exclusief'}).`,
+		REACTIONHANDLER_PROMPT: 'Naar welke pagina wil je navigeren?',
+		COMMANDMESSAGE_MISSING: 'Een of meer vereiste argumenten ontbreken na het einde van de invoer.',
+		COMMANDMESSAGE_MISSING_REQUIRED: name => `${name} is een vereist argument.`,
+		COMMANDMESSAGE_MISSING_OPTIONALS: possibles => `Een vereiste optie ontbreekt: (${possibles})`,
+		COMMANDMESSAGE_NOMATCH: possibles => `Uw optie kwam niet overeen met een van de mogelijkheden: (${possibles})`,
+		MONITOR_COMMAND_HANDLER_REPROMPT: (tag, error, time, abortOptions) => `${tag} | **${error}** | Je hebt **${time}** seconden om te reageren op deze prompt met een geldig argument. Tik **${abortOptions.join('**, **')}** om deze prompt te cancelen.`,
+		MONITOR_COMMAND_HANDLER_REPEATING_REPROMPT: (tag, name, time, cancelOptions) => `${tag} | **${name}** is een herhalend argument | Je hebt **${time}** seconden om te reageren op deze prompt met additionele geldige argumenten. Tik **${cancelOptions.join('**, **')}** om te deze prompt te cancelen.`,
+		MONITOR_COMMAND_HANDLER_ABORTED: 'Geannuleerd',
 		// TODO - favna- start from here
-		RESOLVER_MINMAX_MIN: (name, min, inclusive) => inclusive ? `${name} must be greater than ${min} inclusively.` : `${name} must be greater than ${min} exclusively.`,
-		RESOLVER_MINMAX_MAX: (name, max, inclusive) => inclusive ? `${name} must be less than ${max} inclusively` : `${name} must be less than ${max} exclusively.`,
-		REACTIONHANDLER_PROMPT: 'Which page would you like to jump to?',
-		COMMANDMESSAGE_MISSING: 'Missing one or more required arguments after end of input.',
-		COMMANDMESSAGE_MISSING_REQUIRED: name => `${name} is a required argument.`,
-		COMMANDMESSAGE_MISSING_OPTIONALS: possibles => `Missing a required option: (${possibles})`,
-		COMMANDMESSAGE_NOMATCH: possibles => `Your option didn't match any of the possibilities: (${possibles})`,
-		MONITOR_COMMAND_HANDLER_REPROMPT: (tag, error, time, abortOptions) => `${tag} | **${error}** | You have **${time}** seconds to respond to this prompt with a valid argument. Type **${abortOptions.join('**, **')}** to abort this prompt.`,
-		MONITOR_COMMAND_HANDLER_REPEATING_REPROMPT: (tag, name, time, cancelOptions) => `${tag} | **${name}** is a repeating argument | You have **${time}** seconds to respond to this prompt with additional valid arguments. Type **${cancelOptions.join('**, **')}** to cancel this prompt.`,
-		MONITOR_COMMAND_HANDLER_ABORTED: 'Aborted',
 		INHIBITOR_COOLDOWN: remaining => `You have just used this command. You can use this command again in ${duration(remaining)}.`,
 		INHIBITOR_MISSING_BOT_PERMS: missing => `Insufficient permissions, missing: **${missing}**`,
 		INHIBITOR_NSFW: 'You may not use NSFW commands in this channel.',
