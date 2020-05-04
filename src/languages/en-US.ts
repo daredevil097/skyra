@@ -115,10 +115,10 @@ function ordinal(cardinal: number) {
 	}
 }
 
-function list(values: readonly string[], conjuction: 'and' | 'or') {
+function list(values: readonly (string | number)[], conjuction: 'and' | 'or') {
 	switch (values.length) {
 		case 0: return '';
-		case 1: return values[0];
+		case 1: return `${values[0]}`;
 		case 2: return `${values[0]} ${conjuction} ${values[1]}`;
 		default: {
 			const trail = values.slice(0, -1);
@@ -161,7 +161,7 @@ export default class extends Language {
 		DEFAULT: key => `${key} has not been localized for en-US yet.`,
 		DEFAULT_LANGUAGE: 'Default Language',
 		SETTING_GATEWAY_KEY_NOEXT: key => `The key "${key}" does not exist in the data schema.`,
-		SETTING_GATEWAY_CHOOSE_KEY: keys => `You cannot edit a settings group, pick any of the following: "${keys.join('", "')}"`,
+		SETTING_GATEWAY_CHOOSE_KEY: keys => `You cannot edit a settings group, pick any of the following: ${this.list(keys, 'or')}`,
 		SETTING_GATEWAY_UNCONFIGURABLE_FOLDER: 'This settings group does not have any configurable sub-key.',
 		SETTING_GATEWAY_UNCONFIGURABLE_KEY: key => `The settings key "${key}" has been marked as non-configurable by the bot owner.`,
 		SETTING_GATEWAY_MISSING_VALUE: (entry, value) => `The value "${value}" cannot be removed from the key "${entry.path}" because it does not exist.`,
@@ -178,7 +178,7 @@ export default class extends Language {
 		RESOLVER_INVALID_GUILD: name => `${name} must be a valid guild id.`,
 		RESOLVER_INVALID_INT: name => `${name} must be an integer.`,
 		RESOLVER_INVALID_INVITE: name => `${name} must be a valid invite link.`,
-		RESOLVER_INVALID_WAGER: bet => `I am sorry, but ${bet} ${SHINY} is an invalid amount to bet. You can bet one of ${ShinyWager.kValidBetAmounts.map(amount => `\`${amount}\``).join(', ')}`,
+		RESOLVER_INVALID_WAGER: bet => `I am sorry, but ${bet} ${SHINY} is an invalid amount to bet. You can bet one of ${this.list(ShinyWager.kValidBetAmounts, 'or')}`,
 		RESOLVER_INVALID_LITERAL: name => `Your option did not match the only possibility: ${name}`,
 		RESOLVER_INVALID_MEMBER: name => `${name} must be a mention or valid user id.`,
 		RESOLVER_INVALID_MESSAGE: name => `${name} must be a valid message id.`,
