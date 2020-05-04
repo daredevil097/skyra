@@ -8,5 +8,7 @@
 	"deepscan.enable": true,
 	"[typescript]": {
 		"editor.defaultFormatter": "vscode.typescript-language-features"
-	}
+	},
+	"cSpell.enabled": false,
+	"cSpell.language": "en,nl"
 }
