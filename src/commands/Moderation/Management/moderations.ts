@@ -3,6 +3,7 @@ import { ModerationManagerEntry } from '@lib/structures/ModerationManagerEntry';
 import { RichDisplayCommand, RichDisplayCommandOptions } from '@lib/structures/RichDisplayCommand';
 import { UserRichDisplay } from '@lib/structures/UserRichDisplay';
 import { PermissionLevels } from '@lib/types/Enums';
+import { LanguageKeys } from '@lib/types/Languages';
 import { ApplyOptions } from '@skyra/decorators';
 import { BrandingColors, Moderation } from '@utils/constants';
 import { getColor } from '@utils/util';
@@ -41,10 +42,11 @@ export default class extends RichDisplayCommand {
 
 		// Set up the formatter
 		const durationDisplay = message.language.duration.bind(message.language);
-		const displayName = action === 'all';
+		const shouldDisplayName = action === 'all';
+		const i18n = message.language.tget('COMMAND_MODERATIONS_ENTRY_DATA');
 		const format = target
-			? this.displayModerationLogFromModerators.bind(this, usernames, durationDisplay, displayName)
-			: this.displayModerationLogFromUsers.bind(this, usernames, durationDisplay, displayName);
+			? this.displayModerationLogFromModerators.bind(this, i18n, usernames, durationDisplay, shouldDisplayName)
+			: this.displayModerationLogFromUsers.bind(this, i18n, usernames, durationDisplay, shouldDisplayName);
 
 		for (const page of util.chunk([...entries.values()], 10)) {
 			display.addPage((template: MessageEmbed) => {
@@ -60,29 +62,29 @@ export default class extends RichDisplayCommand {
 		return response;
 	}
 
-	private displayModerationLogFromModerators(users: Map<string, string>, duration: DurationDisplay, displayName: boolean, entry: ModerationManagerEntry) {
+	private displayModerationLogFromModerators(i18n: LanguageKeys['COMMAND_MODERATIONS_ENTRY_DATA'], users: Map<string, string>, duration: DurationDisplay, shouldDisplayName: boolean, entry: ModerationManagerEntry) {
 		const remainingTime = entry.duration === null || entry.createdAt === null ? null : (entry.createdAt + entry.duration) - Date.now();
-		const expired = remainingTime !== null && remainingTime <= 0;
+		const isExpired = remainingTime !== null && remainingTime <= 0;
 		const formattedModerator = users.get(entry.flattenedModerator);
-		const formattedReason = entry.reason || 'None';
-		const formattedDuration = remainingTime === null ? '' : expired ? `\nExpired ${duration(-remainingTime)} ago.` : `\nExpires in: ${duration(remainingTime)}`;
-		const formattedValue = `Moderator: **${formattedModerator}**.\n${formattedReason}${formattedDuration}`;
+		const formattedReason = entry.reason || i18n.REASON_NONE;
+		const formattedDuration = i18n.FORMATTED_DURATION(remainingTime, isExpired);
+		const formattedValue = i18n.FORMATTED_VALUE('moderator', formattedModerator as string, formattedReason, formattedDuration);
 		return {
-			name: displayName ? `Case \`${entry.case}\` | ${entry.title}` : `Case \`${entry.case}\``,
-			value: expired ? `~~${formattedValue.replace(/(^)?~~($)?/g, (_, start, end) => `${start ? '\u200B' : ''}~\u200B~${end ? '\u200B' : ''}`)}~~` : formattedValue
+			name: i18n.TITLE(shouldDisplayName, entry),
+			value: i18n.VALUE(isExpired, formattedValue)
 		};
 	}
 
-	private displayModerationLogFromUsers(users: Map<string, string>, duration: DurationDisplay, displayName: boolean, entry: ModerationManagerEntry) {
+	private displayModerationLogFromUsers(i18n: LanguageKeys['COMMAND_MODERATIONS_ENTRY_DATA'], users: Map<string, string>, duration: DurationDisplay, shouldDisplayName: boolean, entry: ModerationManagerEntry) {
 		const remainingTime = entry.duration === null || entry.createdAt === null ? null : (entry.createdAt + entry.duration) - Date.now();
-		const expired = remainingTime !== null && remainingTime <= 0;
+		const isExpired = remainingTime !== null && remainingTime <= 0;
 		const formattedUser = users.get(entry.flattenedUser);
-		const formattedReason = entry.reason || 'None';
-		const formattedDuration = remainingTime === null ? '' : `\nExpires in: ${duration(remainingTime)}`;
-		const formattedValue = `User: **${formattedUser}**.\n${formattedReason}${formattedDuration}`;
+		const formattedReason = entry.reason || i18n.REASON_NONE;
+		const formattedDuration = i18n.FORMATTED_DURATION(remainingTime, isExpired);
+		const formattedValue = i18n.FORMATTED_VALUE('user', formattedUser as string, formattedReason, formattedDuration);
 		return {
-			name: displayName ? `Case \`${entry.case}\` | ${entry.title}` : `Case \`${entry.case}\``,
-			value: expired ? `~~${formattedValue.replace(/(^)?~~($)?/g, (_, start, end) => `${start ? '\u200B' : ''}~\u200B~${end ? '\u200B' : ''}`)}~~` : formattedValue
+			name: i18n.TITLE(shouldDisplayName, entry),
+			value: i18n.VALUE(isExpired, formattedValue)
 		};
 	}
 
