@@ -46,7 +46,12 @@ export default class extends RichDisplayCommand {
 			: this.displayModerationLogFromUsers.bind(this, usernames, durationDisplay, displayName);
 
 		for (const page of util.chunk([...entries.values()], 10)) {
-			display.addPage((template: MessageEmbed) => template.setDescription(page.map(format)));
+			display.addPage((template: MessageEmbed) => {
+				for (const entry of page) {
+					const field = format(entry);
+					template.addField(field.name, field.value);
+				}
+			});
 		}
 
 		await display.start(response, message.author.id);
@@ -55,20 +60,28 @@ export default class extends RichDisplayCommand {
 
 	private displayModerationLogFromModerators(users: Map<string, string>, duration: DurationDisplay, displayName: boolean, entry: ModerationManagerEntry) {
 		const remainingTime = entry.duration === null || entry.createdAt === null ? null : (entry.createdAt + entry.duration) - Date.now();
+		const expired = remainingTime !== null && remainingTime <= 0;
 		const formattedModerator = users.get(entry.flattenedModerator);
 		const formattedReason = entry.reason || 'None';
-		const formattedDuration = remainingTime === null ? '' : `\nExpires in: ${duration(remainingTime)}`;
-		const formattedTitle = displayName ? `**${entry.title}**\n` : '';
-		return `${formattedTitle}Case \`${entry.case}\`. Moderator: **${formattedModerator}**.\n${formattedReason}${formattedDuration}`;
+		const formattedDuration = remainingTime === null ? '' : expired ? `\nExpired ${duration(-remainingTime)} ago.` : `\nExpires in: ${duration(remainingTime)}`;
+		const formattedValue = `Moderator: **${formattedModerator}**.\n${formattedReason}${formattedDuration}`;
+		return {
+			name: displayName ? `${entry.case} | ${entry.title}` : `${entry.case}`,
+			value: expired ? `~~${formattedValue.replace(/(^)?~~($)?/g, (_, start, end) => `${start ? '\u200B' : ''}~\u200B~${end ? '\u200B' : ''}`)}~~` : formattedValue
+		};
 	}
 
 	private displayModerationLogFromUsers(users: Map<string, string>, duration: DurationDisplay, displayName: boolean, entry: ModerationManagerEntry) {
 		const remainingTime = entry.duration === null || entry.createdAt === null ? null : (entry.createdAt + entry.duration) - Date.now();
+		const expired = remainingTime !== null && remainingTime <= 0;
 		const formattedUser = users.get(entry.flattenedUser);
 		const formattedReason = entry.reason || 'None';
 		const formattedDuration = remainingTime === null ? '' : `\nExpires in: ${duration(remainingTime)}`;
-		const formattedTitle = displayName ? `**${entry.title}**\n` : '';
-		return `${formattedTitle}Case \`${entry.case}\`. User: **${formattedUser}**.\n${formattedReason}${formattedDuration}`;
+		const formattedValue = `User: **${formattedUser}**.\n${formattedReason}${formattedDuration}`;
+		return {
+			name: displayName ? `${entry.case} | ${entry.title}` : `${entry.case}`,
+			value: expired ? `~~${formattedValue.replace(/(^)?~~($)?/g, (_, start, end) => `${start ? '\u200B' : ''}~\u200B~${end ? '\u200B' : ''}`)}~~` : formattedValue
+		};
 	}
 
 	private async fetchAllUsers(entries: Collection<number, ModerationManagerEntry>) {
