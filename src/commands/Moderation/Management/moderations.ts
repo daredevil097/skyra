@@ -10,6 +10,7 @@ import { MessageEmbed } from 'discord.js';
 import { KlasaMessage, KlasaUser, util } from 'klasa';
 
 @ApplyOptions<RichDisplayCommandOptions>({
+	aliases: ['moderation'],
 	bucket: 2,
 	cooldown: 10,
 	description: language => language.tget('COMMAND_MODERATIONS_DESCRIPTION'),
